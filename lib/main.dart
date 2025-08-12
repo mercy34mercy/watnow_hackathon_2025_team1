@@ -1,3 +1,4 @@
+import 'package:carrot_harvest_game/screens/melon_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/game_screen.dart';
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const HomeScreen(),
         '/game': (context) => const GameScreen(),
+        '/game/melon':(context) => const GameMelonScreen(),
         '/result': (context) => const ResultScreen(),
       },
     );
