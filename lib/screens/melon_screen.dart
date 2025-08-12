@@ -83,8 +83,8 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.brown[100],
-      body: Stack(
+      backgroundColor: Colors.green[100],//はいけい
+      body: Stack(//下の方の背景
         children: [
           Positioned(
             bottom: 0,
@@ -92,7 +92,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
             right: 0,
             height: 150,
             child: Container(
-              color: Colors.brown[600],
+              color: Colors.green[600],
             ),
           ),
           Center(
