@@ -122,7 +122,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
                       child: Transform.translate(
                         offset: Offset(0, -_carrotPosition),
                         child: Image.asset(
-                          'assets/ninzin.png',
+                          'melon.png',
                           height: 200,
                         ),
                       ),
