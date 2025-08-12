@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -27,7 +28,14 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {
+                int veg = Random().nextInt(3);
+                if(veg==0){
                 Navigator.pushNamed(context, '/game');
+                }else if(veg==1){
+                Navigator.pushNamed(context, '/game/melon');  
+                }else{
+                Navigator.pushNamed(context, '/game/pumpkin');
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
