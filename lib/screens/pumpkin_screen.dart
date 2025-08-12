@@ -122,7 +122,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
                       child: Transform.translate(
                         offset: Offset(0, -_carrotPosition),
                         child: Image.asset(
-                          'pumpkin.png',
+                          'assets/pumpkin.png',
                           height: 200,
                         ),
                       ),
