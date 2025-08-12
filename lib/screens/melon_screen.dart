@@ -42,7 +42,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
   
   void _startAccelerometer() {
     _accelerometerSubscription = accelerometerEventStream().listen((event) {
-      double magnitude = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
+      double magnitude = event.x.abs();
       
       if (magnitude > 15 && !_isShaking) {
         _isShaking = true;
@@ -106,7 +106,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
                 const SizedBox(height: 20),
                 if (_canHarvest)
                   const Text(
-                    '思いっきり振り上げて収穫！',
+                    '思いっきり横に振って収穫！',
                     style: TextStyle(
                       fontSize: 20,
                       color: Colors.red,
@@ -122,7 +122,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
                       child: Transform.translate(
                         offset: Offset(0, -_carrotPosition),
                         child: Image.asset(
-                          'melon.png',
+                          'assets/melon.png',
                           height: 200,
                         ),
                       ),
