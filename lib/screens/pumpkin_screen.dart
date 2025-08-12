@@ -83,7 +83,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.brown[100],
+      backgroundColor: const Color.fromARGB(255, 255, 205, 151),
       body: Stack(
         children: [
           Positioned(
@@ -92,7 +92,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
             right: 0,
             height: 150,
             child: Container(
-              color: Colors.brown[600],
+              color: const Color.fromARGB(255, 194, 107, 0),
             ),
           ),
           Center(
@@ -122,7 +122,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
                       child: Transform.translate(
                         offset: Offset(0, -_carrotPosition),
                         child: Image.asset(
-                          'assets/ninzin.png',
+                          'pumpkin.png',
                           height: 200,
                         ),
                       ),
