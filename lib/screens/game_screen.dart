@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
+import '../theme/app_colors.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -83,7 +84,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.brown[100],
+      backgroundColor: AppColors.backgroundCream,
       body: Stack(
         children: [
           Positioned(
@@ -92,7 +93,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             right: 0,
             height: 150,
             child: Container(
-              color: Colors.brown[600],
+              color: AppColors.earthBrown,
             ),
           ),
           Center(
@@ -101,7 +102,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               children: [
                 Text(
                   '振った回数: $_shakeCount',
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textDark),
                 ),
                 const SizedBox(height: 20),
                 if (_canHarvest)
@@ -109,7 +110,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                     '思いっきり振り上げて収穫！',
                     style: TextStyle(
                       fontSize: 20,
-                      color: Colors.red,
+                      color: AppColors.secondaryOrange,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

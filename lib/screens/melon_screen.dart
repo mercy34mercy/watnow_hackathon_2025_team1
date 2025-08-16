@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
+import '../theme/app_colors.dart';
 
 class GameMelonScreen extends StatefulWidget {
   const GameMelonScreen({super.key});
@@ -92,7 +93,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
             right: 0,
             height: 150,
             child: Container(
-              color: Colors.green[600],
+              color: AppColors.primaryGreen,
             ),
           ),
           Center(
@@ -101,7 +102,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
               children: [
                 Text(
                   '振った回数: $_shakeCount',
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textDark),
                 ),
                 const SizedBox(height: 20),
                 if (_canHarvest)
@@ -109,7 +110,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
                     '思いっきり横に振って収穫！',
                     style: TextStyle(
                       fontSize: 20,
-                      color: Colors.red,
+                      color: AppColors.secondaryOrange,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
