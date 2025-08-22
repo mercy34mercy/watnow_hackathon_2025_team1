@@ -22,8 +22,9 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
   bool _canHarvest = false;
   double _carrotPosition = 0;
   bool isCooked = false;
+  bool isCut = false;
+  int kneadCount = 0;
   final AudioPlayer _bgmPlayer = AudioPlayer();
-  
 
   @override
   void initState() {
@@ -42,7 +43,35 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
     _startAccelerometer();
   }
 
+  void _onVerticalSwipe(DragEndDetails details) {
+    if (details.primaryVelocity != null && details.primaryVelocity!.abs() > 500)
+      if (isCut && !isCooked) {
+        setState(() {
+          kneadCount++;
+          if (kneadCount >= 10) {
+            isCooked = true;
+          }
+        });
+      }
+  }
+
   void _startAccelerometer() {
+  
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        backgroundColor: Colors.brown[100],
+        body: GestureDetector(
+          onVerticalDragEnd: _onVerticalSwipe,
+          child: Stack(
+            children: [
+              //
+            ],
+          ),
+        ),
+      );
+    }
+
     _accelerometerSubscription = accelerometerEventStream().listen((event) {
       double magnitude = event.y.abs();
       if (magnitude > 15 && !_isShaking) {
@@ -56,7 +85,7 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
           _carrotPosition = min(_shakeCount * 2.0, 20.0);
 
           if (_shakeCount >= 5) {
-            _canHarvest = true;
+            isCut = true;
           }
         });
 
@@ -92,81 +121,92 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.brown[100],
-      body: Stack(
-        children: [
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 150,
-            child: Container(color: Colors.brown[600]),
-          ),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                     Image.asset(
-          'assets/bikkurisen.png',
-          width: 300,
-        ),
-                    Text(
-                      '切れ!',
-                      style: const TextStyle(
-                        fontSize: 66,
-                        fontWeight: FontWeight.bold,
+      body: GestureDetector(
+        onVerticalDragEnd: _onVerticalSwipe,
+        child: Stack(
+          children: [
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 150,
+              child: Container(color: Colors.brown[600]),
+            ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset('assets/bikkurisen.png', width: 300),
+                      Text(
+                        isCut ? 'こねろ!' : '切れ!',
+                        style: const TextStyle(
+                          fontSize: 66,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 30),
-                Text(
-                  '切った回数: $_shakeCount',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                    ],
                   ),
-                ),
-                const SizedBox(height: 20),
-                if (_canHarvest)
-                  const Text(
-                    '思いっきり振り上げて収穫！',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.red,
+
+                  SizedBox(height: 30),
+                  Text(
+                    '切った回数: $_shakeCount',
+                    style: const TextStyle(
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                const SizedBox(height: 40),
-                AnimatedBuilder(
-                  animation: _shakeAnimation,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(
-                        _shakeAnimation.value *
-                            sin(_animationController.value * pi * 2),
-                        0,
+
+                  if (isCut && !isCooked) ...[
+                    const SizedBox(height: 20),
+                    Text(
+                      'こねた回数: $kneadCount / 10',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
-                      child: Transform.translate(
-                        offset: Offset(0, -_carrotPosition),
-                        child: Image.asset(
-                          isCooked
-                              ? 'assets/carrotcake.png'
-                              : 'assets/ninzin.png',
-                          height: 200,
+                    ),
+                  ],
+                  const SizedBox(height: 20),
+                  if (_canHarvest)
+                    const Text(
+                      '思いっきり振り上げて収穫！',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  const SizedBox(height: 40),
+                  AnimatedBuilder(
+                    animation: _shakeAnimation,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset: Offset(
+                          _shakeAnimation.value *
+                              sin(_animationController.value * pi * 2),
+                          0,
                         ),
-                      ),
-                    );
-                  },
-                ),
-              ],
+                        child: Transform.translate(
+                          offset: Offset(0, -_carrotPosition),
+                          child: Image.asset(
+                            isCooked
+                                ? 'assets/carrotcake.png'
+                                : 'assets/ninzin.png',
+                            height: 200,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
