@@ -23,6 +23,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
   bool _canHarvest = false;
   double _carrotPosition = 0;
   final AudioPlayer _bgmPlayer = AudioPlayer();
+  final AudioPlayer _sePlayer = AudioPlayer();
   
   @override
   void initState() {
@@ -77,6 +78,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
           var pumpkincount = prefs.getInt('pumpkin') ?? 0;
           pumpkincount += 1;
           await prefs.setInt('pumpkin', pumpkincount);
+          _sePlayer.play(AssetSource('harvest_success.mp3'));
           Navigator.pushReplacementNamed(context, '/result/pumpkin');
         }
       }
@@ -89,7 +91,9 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
         timelimit--;
       });
     } else {
-      timer.cancel(); // 0 になったらタイマーを止める
+      timer.cancel();
+      _sePlayer.play(AssetSource('bad_smell.mp3'));
+      // 0 になったらタイマーを止める
       // 必要ならここでリザルト画面に遷移するなどの処理
       Navigator.pushReplacementNamed(context, '/result/failed/pumpkin');
     }

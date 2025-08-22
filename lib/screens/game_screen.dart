@@ -24,6 +24,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   double _carrotPosition = 0;
 
   final AudioPlayer _bgmPlayer = AudioPlayer();
+  final AudioPlayer _sePlayer = AudioPlayer();
   
   @override
   void initState() {
@@ -77,6 +78,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
           var carrotcount = prefs.getInt('carrot') ?? 0;
           carrotcount += 1;
           await prefs.setInt('carrot', carrotcount);
+          _sePlayer.play(AssetSource('harvest_success.mp3'));
           Navigator.pushReplacementNamed(context, '/result');
         }
       }
@@ -89,7 +91,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         timelimit--;
       });
     } else {
-      timer.cancel(); 
+      timer.cancel();
+      _sePlayer.play(AssetSource('bad_smell.mp3')); 
        Navigator.pushReplacementNamed(context, '/result/failed/carrot');
     }
   });
