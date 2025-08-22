@@ -32,26 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _cooking() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('料理'),
-          content: const Text('料理機能は準備中です！'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,7 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: _cooking,
+                    onPressed: (){
+                      Navigator.pushNamed(context, '/cook/carrotcake');
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),

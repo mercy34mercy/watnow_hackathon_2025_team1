@@ -6,6 +6,7 @@ import 'screens/game_screen.dart';
 import 'screens/result_screen.dart';
 import 'screens/result_melon.dart';
 import 'screens/result_pumpkin.dart';
+import 'screens/carrotcake_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,6 +32,8 @@ class MyApp extends StatelessWidget {
         '/result/melon': (context) => const ResultMelon(),
         '/result/pumpkin':(context) => const ResultPumpkin(),
         '/game/pumpkin': (context) => const GamePumpkinScreen(),
+        '/cook/carrotcake':(context) => const CookCarrotScreen(),
+
       },
     );
   }
