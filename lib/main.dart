@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/game_screen.dart';
 import 'screens/result_screen.dart';
+import 'screens/result_melon.dart';
+import 'screens/result_pumpkin.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,6 +28,8 @@ class MyApp extends StatelessWidget {
         '/game': (context) => const GameScreen(),
         '/game/melon':(context) => const GameMelonScreen(),
         '/result': (context) => const ResultScreen(),
+        '/result/melon': (context) => const ResultMelon(),
+        '/result/pumpkin':(context) => const ResultPumpkin(),
         '/game/pumpkin': (context) => const GamePumpkinScreen(),
       },
     );
