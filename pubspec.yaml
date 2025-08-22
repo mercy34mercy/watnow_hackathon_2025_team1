@@ -64,8 +64,10 @@ flutter:
     - assets/ninzin.png
     - assets/melon.png
     - assets/pumpkin.png
+    - assets/carrotcake.png
     - assets/rabbit.png
-
+    - assets/melonjuice.png
+    - assets/pumpkinsoup.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
