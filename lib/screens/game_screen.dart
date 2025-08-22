@@ -42,8 +42,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   
   void _startAccelerometer() {
     _accelerometerSubscription = accelerometerEventStream().listen((event) {
-      double magnitude = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
-      
+      double magnitude =  event.y.abs();
       if (magnitude > 15 && !_isShaking) {
         _isShaking = true;
         _animationController.forward().then((_) {
