@@ -76,6 +76,12 @@ flutter:
     - assets/harvest.mp3
     - assets/home.mp3
     - assets/cook.mp3
+    - assets/bad_smell.mp3
+    - assets/cook_success.mp3
+    - assets/cut.mp3
+    - assets/failed.mp3
+    - assets/harvest_success.mp3
+    - assets/taiko.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

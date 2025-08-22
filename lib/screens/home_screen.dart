@@ -16,6 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int pumpkincount = 0;
   int meloncount = 0;
   final AudioPlayer _bgmPlayer = AudioPlayer();
+  final AudioPlayer _sePlayer = AudioPlayer();
   @override
   void initState(){
     super.initState();
@@ -71,6 +72,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ElevatedButton(
                     onPressed: ()async {
                 int veg = Random().nextInt(3);
+                await _sePlayer.play(AssetSource('taiko.mp3'));
+                await _sePlayer.onPlayerComplete.first;
                 _bgmPlayer.dispose();
                 if(veg==0){
                 await Navigator.pushNamed(context, '/game');
@@ -91,8 +94,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: (){
+                    onPressed: () async {
                       _bgmPlayer.dispose();
+                      await _sePlayer.play(AssetSource('taiko.mp3'));
+                      await _sePlayer.onPlayerComplete.first;
                       Navigator.pushNamed(context, '/cook/pumpkinsoup');
                     },
                     style: ElevatedButton.styleFrom(

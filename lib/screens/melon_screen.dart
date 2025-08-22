@@ -23,6 +23,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
   bool _canHarvest = false;
   double _carrotPosition = 0;
   final AudioPlayer _bgmPlayer = AudioPlayer();
+  final AudioPlayer _sePlayer = AudioPlayer();
   
   @override
   void initState() {
@@ -76,6 +77,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
           var meloncount = prefs.getInt('melon') ?? 0;
           meloncount += 1;
           await prefs.setInt('melon', meloncount);
+          _sePlayer.play(AssetSource('harvest_success.mp3'));
           Navigator.pushReplacementNamed(context, '/result/melon');
         }
       }
@@ -88,7 +90,9 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
         timelimit--;
       });
     } else {
-      timer.cancel(); // 0 になったらタイマーを止める
+      timer.cancel(); 
+      _sePlayer.play(AssetSource('bad_smell.mp3'));
+      // 0 になったらタイマーを止める
       // 必要ならここでリザルト画面に遷移するなどの処理
       Navigator.pushReplacementNamed(context, '/result/failed/melon');
     }

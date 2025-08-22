@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:audioplayers/audioplayers.dart';
+final AudioPlayer _sePlayer = AudioPlayer();
 
 
 class ResultPumpkin extends StatelessWidget {
@@ -36,7 +37,9 @@ class ResultPumpkin extends StatelessWidget {
             ),
             const SizedBox(height: 60),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                await _sePlayer.play(AssetSource('taiko.mp3'));
+                await _sePlayer.onPlayerComplete.first;
                 Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
               },
               style: ElevatedButton.styleFrom(
