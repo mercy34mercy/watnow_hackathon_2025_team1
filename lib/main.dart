@@ -7,9 +7,9 @@ import 'screens/game_screen.dart';
 import 'screens/result_screen.dart';
 import 'screens/result_melon.dart';
 import 'screens/result_pumpkin.dart';
-import 'screens/carrotcake_screen.dart';
-import 'screens/melonjuice_screen.dart';
-import 'screens/pumpkinsoup_screen.dart';
+import 'screens/cook_carrot.dart';
+import 'screens/cook_melon.dart';
+import 'screens/cook_pumpkin.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
