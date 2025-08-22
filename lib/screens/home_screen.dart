@@ -1,54 +1,144 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int melonCount = 0;
+  int carrotCount = 0;
+  int pumpkinCount = 0;
+
+  void _gacha() async {
+    final result = await Navigator.pushNamed(context, '/farm-gacha');
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        switch (result['item']) {
+          case '人参':
+            carrotCount += result['count'] as int;
+            break;
+          case 'メロン':
+            melonCount += result['count'] as int;
+            break;
+          case 'カボチャ':
+            pumpkinCount += result['count'] as int;
+            break;
+        }
+      });
+    }
+  }
+
+  void _cooking() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('料理'),
+          content: const Text('料理機能は準備中です！'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green[50],
-      body: Center(
+      backgroundColor: const Color.fromARGB(255, 255, 205, 151),
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              '人参収穫ゲーム',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.orange,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildItemCounter('assets/melon.png', melonCount),
+                  _buildItemCounter('assets/ninzin.png', carrotCount),
+                  _buildItemCounter('assets/pumpkin.png', pumpkinCount),
+                ],
               ),
             ),
-            const SizedBox(height: 40),
-            Image.asset(
-              'assets/ninzin.png',
-              height: 200,
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () {
-                int veg = Random().nextInt(3);
-                if(veg==0){
-                Navigator.pushNamed(context, '/game');
-                }else if(veg==1){
-                Navigator.pushNamed(context, '/game/melon');  
-                }else{
-                Navigator.pushNamed(context, '/game/pumpkin');
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+            Expanded(
+              child: Center(
+                child: Image.asset(
+                  'assets/rabbit.png',
+                  height: 250,
+                ),
               ),
-              child: const Text(
-                'ゲームスタート',
-                style: TextStyle(fontSize: 20),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: _gacha,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 255, 166, 71),
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    ),
+                    child: const Text(
+                      '畑ガチャ',
+                      style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 255, 255, 255)),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: _cooking,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    ),
+                    child: const Text(
+                      '料理',
+                      style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 255, 255, 255)),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildItemCounter(String imagePath, int count) {
+    return Column(
+      children: [
+        Image.asset(
+          imagePath,
+          height: 50,
+          width: 50,
+        ),
+        const SizedBox(height: 4),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color.fromARGB(255, 255, 166, 71), width: 2),
+          ),
+          child: Text(
+            '×$count',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color.fromARGB(255, 255, 166, 71),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
