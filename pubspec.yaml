@@ -63,6 +63,7 @@ flutter:
     - assets/ninzin.png
     - assets/melon.png
     - assets/pumpkin.png
+    - assets/carrotcake.png
     - assets/rabbit.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
