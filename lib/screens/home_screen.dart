@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class homeScreen extends StatelessWidget {
+  const homeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
