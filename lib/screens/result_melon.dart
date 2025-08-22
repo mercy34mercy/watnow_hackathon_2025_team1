@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+
 class ResultMelon extends StatelessWidget {
   const ResultMelon({super.key});
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(

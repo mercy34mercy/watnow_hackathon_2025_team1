@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,28 +10,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int melonCount = 0;
-  int carrotCount = 0;
-  int pumpkinCount = 0;
-
-  void _gacha() async {
-    final result = await Navigator.pushNamed(context, '/farm-gacha');
-    if (result != null && result is Map<String, dynamic>) {
-      setState(() {
-        switch (result['item']) {
-          case '人参':
-            carrotCount += result['count'] as int;
-            break;
-          case 'メロン':
-            melonCount += result['count'] as int;
-            break;
-          case 'カボチャ':
-            pumpkinCount += result['count'] as int;
-            break;
-        }
-      });
-    }
+// carrot 変数
+int carrotcount = 0; 
+int pumpkincount = 0;
+int meloncount = 0;
+  @override
+  void initState(){
+    super.initState();
+    _loadCount();
   }
+
+  Future<void> _loadCount() async{
+  final prefs = await SharedPreferences.getInstance();
+  setState(() {
+    carrotcount = prefs.getInt('carrot')  ?? 0;
+    meloncount = prefs.getInt('melon') ?? 0;
+    pumpkincount = prefs.getInt('pumpkin') ?? 0;
+  });
+  
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildItemCounter('assets/melon.png', melonCount),
-                  _buildItemCounter('assets/ninzin.png', carrotCount),
-                  _buildItemCounter('assets/pumpkin.png', pumpkinCount),
+                  _buildItemCounter('assets/melon.png', meloncount),
+                  _buildItemCounter('assets/ninzin.png', carrotcount),
+                  _buildItemCounter('assets/pumpkin.png', pumpkincount),
                 ],
               ),
             ),
@@ -64,15 +63,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: ()async {
                 int veg = Random().nextInt(3);
                 if(veg==0){
-                Navigator.pushNamed(context, '/game');
+                await Navigator.pushNamed(context, '/game');
                 }else if(veg==1){
-                Navigator.pushNamed(context, '/game/melon');  
+                await Navigator.pushNamed(context, '/game/melon');  
                 }else{
-                Navigator.pushNamed(context, '/game/pumpkin');
+                await Navigator.pushNamed(context, '/game/pumpkin');
                 }
+                _loadCount();
               },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 255, 166, 71),
