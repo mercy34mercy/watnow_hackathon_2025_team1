@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   ElevatedButton(
                     onPressed: (){
-                      Navigator.pushNamed(context, '/cook/melonjuice');
+                      Navigator.pushNamed(context, '/cook/pumpkinsoup');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
