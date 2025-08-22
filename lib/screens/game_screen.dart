@@ -3,6 +3,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -21,10 +22,13 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   bool _isShaking = false;
   bool _canHarvest = false;
   double _carrotPosition = 0;
+
+  final AudioPlayer _bgmPlayer = AudioPlayer();
   
   @override
   void initState() {
     super.initState();
+    _playBGM();
     
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 100),
@@ -90,11 +94,16 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     }
   });
 }
-  
+  Future<void> _playBGM() async{
+    await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
+    await _bgmPlayer.play(AssetSource('harvest.mp3'));
+  }
+
   @override
   void dispose() {
     _accelerometerSubscription?.cancel();
     _animationController.dispose();
+    _bgmPlayer.dispose();
     super.dispose();
   }
   

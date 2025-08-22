@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
+import 'package:audioplayers/audioplayers.dart';
 
 class CookCarrotScreen extends StatefulWidget {
   const CookCarrotScreen({super.key});
@@ -21,10 +22,13 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
   bool _canHarvest = false;
   double _carrotPosition = 0;
   bool isCooked = false;
+  final AudioPlayer _bgmPlayer = AudioPlayer();
+  
 
   @override
   void initState() {
     super.initState();
+    _playBGM();
 
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 100),
@@ -70,11 +74,17 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
       }
     });
   }
+  Future<void> _playBGM() async{
+    await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
+    await _bgmPlayer.play(AssetSource('cook.mp3'));
+  }
+
 
   @override
   void dispose() {
     _accelerometerSubscription?.cancel();
     _animationController.dispose();
+    _bgmPlayer.dispose();
     super.dispose();
   }
 

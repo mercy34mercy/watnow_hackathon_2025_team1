@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
+import 'package:audioplayers/audioplayers.dart';
 
 class CookPumpkinScreen extends StatefulWidget {
   const CookPumpkinScreen({super.key});
@@ -19,11 +20,12 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen> with SingleTicker
   bool _isShaking = false;
   bool _canHarvest = false;
   double _carrotPosition = 0;
+  final AudioPlayer _bgmPlayer = AudioPlayer();
   
   @override
   void initState() {
     super.initState();
-    
+    _playBGM();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 100),
       vsync: this,
@@ -71,11 +73,15 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen> with SingleTicker
       }
     });
   }
-  
+  Future<void> _playBGM() async{
+    await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
+    await _bgmPlayer.play(AssetSource('cook.mp3'));
+  }
   @override
   void dispose() {
     _accelerometerSubscription?.cancel();
     _animationController.dispose();
+    _bgmPlayer.dispose();
     super.dispose();
   }
   
