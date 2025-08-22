@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -83,7 +84,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    onPressed: _gacha,
+                    onPressed: () {
+                int veg = Random().nextInt(3);
+                if(veg==0){
+                Navigator.pushNamed(context, '/game');
+                }else if(veg==1){
+                Navigator.pushNamed(context, '/game/melon');  
+                }else{
+                Navigator.pushNamed(context, '/game/pumpkin');
+                }
+              },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 255, 166, 71),
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
