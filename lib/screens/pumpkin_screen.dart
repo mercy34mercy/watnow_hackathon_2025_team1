@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GamePumpkinScreen extends StatefulWidget {
   const GamePumpkinScreen({super.key});
@@ -41,7 +42,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
   }
   
   void _startAccelerometer() {
-    _accelerometerSubscription = accelerometerEventStream().listen((event) {
+    _accelerometerSubscription = accelerometerEventStream().listen((event) async {
       double magnitude = event.z.abs();
       
       if (magnitude > 25 && !_isShaking) {
@@ -67,6 +68,10 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
       if (_canHarvest && magnitude > 25) {
         _accelerometerSubscription?.cancel();
         if (mounted) {
+          final prefs = await SharedPreferences.getInstance();
+          var pumpkincount = prefs.getInt('pumpkin') ?? 0;
+          pumpkincount += 1;
+          await prefs.setInt('pumpkin', pumpkincount);
           Navigator.pushReplacementNamed(context, '/result/pumpkin');
         }
       }
