@@ -6,7 +6,6 @@ import 'screens/game_screen.dart';
 import 'screens/result_screen.dart';
 import 'screens/result_melon.dart';
 import 'screens/result_pumpkin.dart';
-import 'screens/rabbit_screen.dart';
 
 void main() {
   runApp(const MyApp());
