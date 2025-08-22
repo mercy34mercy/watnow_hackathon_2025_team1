@@ -13,6 +13,9 @@ import 'screens/failed_melon.dart';
 import 'screens/carrotcake_screen.dart';
 import 'screens/melonjuice_screen.dart';
 import 'screens/pumpkinsoup_screen.dart';
+import 'screens/cook_carrot.dart';
+import 'screens/cook_melon.dart';
+import 'screens/cook_pumpkin.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
