@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GameMelonScreen extends StatefulWidget {
   const GameMelonScreen({super.key});
@@ -40,9 +41,10 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
     _startAccelerometer();
   }
   
-  void _startAccelerometer() {
-    _accelerometerSubscription = accelerometerEventStream().listen((event) {
+  void _startAccelerometer()  {
+    _accelerometerSubscription = accelerometerEventStream().listen((event) async {
       double magnitude = event.x.abs();
+      int meloncount = 0;
       
       if (magnitude > 15 && !_isShaking) {
         _isShaking = true;
@@ -67,6 +69,10 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
       if (_canHarvest && magnitude > 25) {
         _accelerometerSubscription?.cancel();
         if (mounted) {
+          final prefs = await SharedPreferences.getInstance();
+          meloncount = prefs.getInt('melon') ?? 0;
+          meloncount += 1;
+          await prefs.setInt('melon', meloncount);
           Navigator.pushReplacementNamed(context, '/result/melon');
         }
       }

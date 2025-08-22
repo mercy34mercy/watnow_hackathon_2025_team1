@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -41,8 +42,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   }
   
   void _startAccelerometer() {
-    _accelerometerSubscription = accelerometerEventStream().listen((event) {
+    _accelerometerSubscription = accelerometerEventStream().listen((event) async {
       double magnitude =  event.y.abs();
+      int carrotcount = 0;
       if (magnitude > 15 && !_isShaking) {
         _isShaking = true;
         _animationController.forward().then((_) {
@@ -66,6 +68,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       if (_canHarvest && magnitude > 25) {
         _accelerometerSubscription?.cancel();
         if (mounted) {
+          final prefs = await SharedPreferences.getInstance();
+          carrotcount = prefs.getInt('carrot') ?? 0;
+          carrotcount += 1;
+          await prefs.setInt('carrot', carrotcount);
           Navigator.pushReplacementNamed(context, '/result');
         }
       }
