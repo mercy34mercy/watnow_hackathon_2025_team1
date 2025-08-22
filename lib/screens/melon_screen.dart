@@ -67,7 +67,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
       if (_canHarvest && magnitude > 25) {
         _accelerometerSubscription?.cancel();
         if (mounted) {
-          Navigator.pushReplacementNamed(context, '/result');
+          Navigator.pushReplacementNamed(context, '/result/melon');
         }
       }
     });
