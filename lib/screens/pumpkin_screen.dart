@@ -3,6 +3,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class GamePumpkinScreen extends StatefulWidget {
   const GamePumpkinScreen({super.key});
@@ -17,13 +18,16 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   
   int _shakeCount = 0;
+  int timelimit = 30;
   bool _isShaking = false;
   bool _canHarvest = false;
   double _carrotPosition = 0;
+  final AudioPlayer _bgmPlayer = AudioPlayer();
   
   @override
   void initState() {
     super.initState();
+    _playBGM();
     
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 100),
@@ -39,6 +43,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
     ));
     
     _startAccelerometer();
+    _startTimer();
   }
   
   void _startAccelerometer() {
@@ -77,10 +82,28 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
       }
     });
   }
+  void _startTimer() {
+  Timer.periodic(const Duration(seconds: 1), (timer) {
+    if (timelimit > 0) {
+      setState(() {
+        timelimit--;
+      });
+    } else {
+      timer.cancel(); // 0 になったらタイマーを止める
+      // 必要ならここでリザルト画面に遷移するなどの処理
+      Navigator.pushReplacementNamed(context, '/result/failed/pumpkin');
+    }
+  });
+}
+  Future<void> _playBGM() async{
+    await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
+    await _bgmPlayer.play(AssetSource('harvest.mp3'));
+  }
   @override
   void dispose() {
     _accelerometerSubscription?.cancel();
     _animationController.dispose();
+    _bgmPlayer.dispose();
     super.dispose();
   }
   
@@ -103,6 +126,10 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Text(
+                  '残り時間: $timelimit',
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
                 Text(
                   '振った回数: $_shakeCount',
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

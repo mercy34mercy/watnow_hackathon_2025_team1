@@ -3,6 +3,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -17,13 +18,17 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   
   int _shakeCount = 0;
+  int timelimit = 30;
   bool _isShaking = false;
   bool _canHarvest = false;
   double _carrotPosition = 0;
+
+  final AudioPlayer _bgmPlayer = AudioPlayer();
   
   @override
   void initState() {
     super.initState();
+    _playBGM();
     
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 100),
@@ -39,6 +44,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     ));
     
     _startAccelerometer();
+    _startTimer();
   }
   
   void _startAccelerometer() {
@@ -76,11 +82,28 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       }
     });
   }
-  
+  void _startTimer() {
+  Timer.periodic(const Duration(seconds: 1), (timer) {
+    if (timelimit > 0) {
+      setState(() {
+        timelimit--;
+      });
+    } else {
+      timer.cancel(); 
+       Navigator.pushReplacementNamed(context, '/result/failed/carrot');
+    }
+  });
+}
+  Future<void> _playBGM() async{
+    await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
+    await _bgmPlayer.play(AssetSource('harvest.mp3'));
+  }
+
   @override
   void dispose() {
     _accelerometerSubscription?.cancel();
     _animationController.dispose();
+    _bgmPlayer.dispose();
     super.dispose();
   }
   
@@ -103,6 +126,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Text(
+                  '残り時間: $timelimit',
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
                 Text(
                   '振った回数: $_shakeCount',
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,12 +12,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 // carrot 変数
-int carrotcount = 0; 
-int pumpkincount = 0;
-int meloncount = 0;
+  int carrotcount = 0; 
+  int pumpkincount = 0;
+  int meloncount = 0;
+  final AudioPlayer _bgmPlayer = AudioPlayer();
   @override
   void initState(){
     super.initState();
+    _playBGM();
     _loadCount();
   }
 
@@ -29,7 +32,10 @@ int meloncount = 0;
   });
   
   }
-
+  Future<void> _playBGM() async{
+    await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
+    await _bgmPlayer.play(AssetSource('home.mp3'));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +71,7 @@ int meloncount = 0;
                   ElevatedButton(
                     onPressed: ()async {
                 int veg = Random().nextInt(3);
+                _bgmPlayer.dispose();
                 if(veg==0){
                 await Navigator.pushNamed(context, '/game');
                 }else if(veg==1){
@@ -85,6 +92,7 @@ int meloncount = 0;
                   ),
                   ElevatedButton(
                     onPressed: (){
+                      _bgmPlayer.dispose();
                       Navigator.pushNamed(context, '/cook/pumpkinsoup');
                     },
                     style: ElevatedButton.styleFrom(
