@@ -44,7 +44,6 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
   void _startAccelerometer()  {
     _accelerometerSubscription = accelerometerEventStream().listen((event) async {
       double magnitude = event.x.abs();
-      int meloncount = 0;
       
       if (magnitude > 15 && !_isShaking) {
         _isShaking = true;
@@ -70,7 +69,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
         _accelerometerSubscription?.cancel();
         if (mounted) {
           final prefs = await SharedPreferences.getInstance();
-          meloncount = prefs.getInt('melon') ?? 0;
+          var meloncount = prefs.getInt('melon') ?? 0;
           meloncount += 1;
           await prefs.setInt('melon', meloncount);
           Navigator.pushReplacementNamed(context, '/result/melon');

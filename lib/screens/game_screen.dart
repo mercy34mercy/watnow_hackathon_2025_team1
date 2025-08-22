@@ -44,7 +44,6 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   void _startAccelerometer() {
     _accelerometerSubscription = accelerometerEventStream().listen((event) async {
       double magnitude =  event.y.abs();
-      int carrotcount = 0;
       if (magnitude > 15 && !_isShaking) {
         _isShaking = true;
         _animationController.forward().then((_) {
@@ -69,7 +68,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         _accelerometerSubscription?.cancel();
         if (mounted) {
           final prefs = await SharedPreferences.getInstance();
-          carrotcount = prefs.getInt('carrot') ?? 0;
+          var carrotcount = prefs.getInt('carrot') ?? 0;
           carrotcount += 1;
           await prefs.setInt('carrot', carrotcount);
           Navigator.pushReplacementNamed(context, '/result');

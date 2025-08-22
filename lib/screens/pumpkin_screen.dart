@@ -44,7 +44,6 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
   void _startAccelerometer() {
     _accelerometerSubscription = accelerometerEventStream().listen((event) async {
       double magnitude = event.z.abs();
-      int pumpkincount = 0;
       
       if (magnitude > 25 && !_isShaking) {
         _isShaking = true;
@@ -70,7 +69,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
         _accelerometerSubscription?.cancel();
         if (mounted) {
           final prefs = await SharedPreferences.getInstance();
-          pumpkincount = prefs.getInt('pumpkin') ?? 0;
+          var pumpkincount = prefs.getInt('pumpkin') ?? 0;
           pumpkincount += 1;
           await prefs.setInt('pumpkin', pumpkincount);
           Navigator.pushReplacementNamed(context, '/result/pumpkin');

@@ -9,6 +9,7 @@ import 'screens/result_melon.dart';
 import 'screens/result_pumpkin.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final int? carrot = prefs.getInt('carrot');
   if (carrot == null) {
