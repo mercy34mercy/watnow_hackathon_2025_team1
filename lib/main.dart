@@ -7,6 +7,9 @@ import 'screens/game_screen.dart';
 import 'screens/result_screen.dart';
 import 'screens/result_melon.dart';
 import 'screens/result_pumpkin.dart';
+import 'screens/failed_carrot.dart';
+import 'screens/failed_pumpkin.dart';
+import 'screens/failed_melon.dart';
 import 'screens/carrotcake_screen.dart';
 import 'screens/melonjuice_screen.dart';
 import 'screens/pumpkinsoup_screen.dart';
@@ -51,6 +54,9 @@ class MyApp extends StatelessWidget {
         '/result': (context) => const ResultScreen(),
         '/result/melon': (context) => const ResultMelon(),
         '/result/pumpkin':(context) => const ResultPumpkin(),
+        '/result/failed/pumpkin':(context) => const FailedPumpkin(),
+        '/result/failed/carrot':(context) => const FailedCarrot(),
+        '/result/failed/melon':(context) => const FailedMelon(),
         '/game/pumpkin': (context) => const GamePumpkinScreen(),
         '/cook/carrotcake':(context) => const CookCarrotScreen(),
         '/cook/melonjuice' :(context) => const CookMelonScreen(),
