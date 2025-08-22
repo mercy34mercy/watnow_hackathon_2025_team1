@@ -67,12 +67,11 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
       if (_canHarvest && magnitude > 25) {
         _accelerometerSubscription?.cancel();
         if (mounted) {
-          Navigator.pushReplacementNamed(context, '/result');
+          Navigator.pushReplacementNamed(context, '/result/pumpkin');
         }
       }
     });
   }
-  
   @override
   void dispose() {
     _accelerometerSubscription?.cancel();
