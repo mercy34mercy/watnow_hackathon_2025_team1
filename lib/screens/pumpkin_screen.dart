@@ -42,9 +42,9 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
   
   void _startAccelerometer() {
     _accelerometerSubscription = accelerometerEventStream().listen((event) {
-      double magnitude = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
+      double magnitude = event.z.abs();
       
-      if (magnitude > 15 && !_isShaking) {
+      if (magnitude > 25 && !_isShaking) {
         _isShaking = true;
         _animationController.forward().then((_) {
           _animationController.reverse();
