@@ -17,6 +17,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   
   int _shakeCount = 0;
+  int timelimit = 30;
   bool _isShaking = false;
   bool _canHarvest = false;
   double _carrotPosition = 0;
@@ -39,6 +40,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     ));
     
     _startAccelerometer();
+    _startTimer();
   }
   
   void _startAccelerometer() {
@@ -76,6 +78,18 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       }
     });
   }
+  void _startTimer() {
+  Timer.periodic(const Duration(seconds: 1), (timer) {
+    if (timelimit > 0) {
+      setState(() {
+        timelimit--;
+      });
+    } else {
+      timer.cancel(); 
+       Navigator.pushReplacementNamed(context, '/result/failed/carrot');
+    }
+  });
+}
   
   @override
   void dispose() {
@@ -103,6 +117,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Text(
+                  '残り時間: $timelimit',
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
                 Text(
                   '振った回数: $_shakeCount',
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

@@ -17,6 +17,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   
   int _shakeCount = 0;
+  int timelimit = 30;
   bool _isShaking = false;
   bool _canHarvest = false;
   double _carrotPosition = 0;
@@ -39,6 +40,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
     ));
     
     _startAccelerometer();
+    _startTimer();
   }
   
   void _startAccelerometer() {
@@ -77,6 +79,19 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
       }
     });
   }
+  void _startTimer() {
+  Timer.periodic(const Duration(seconds: 1), (timer) {
+    if (timelimit > 0) {
+      setState(() {
+        timelimit--;
+      });
+    } else {
+      timer.cancel(); // 0 になったらタイマーを止める
+      // 必要ならここでリザルト画面に遷移するなどの処理
+      Navigator.pushReplacementNamed(context, '/result/failed/pumpkin');
+    }
+  });
+}
   @override
   void dispose() {
     _accelerometerSubscription?.cancel();
@@ -103,6 +118,10 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Text(
+                  '残り時間: $timelimit',
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
                 Text(
                   '振った回数: $_shakeCount',
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
