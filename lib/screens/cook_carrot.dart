@@ -53,15 +53,7 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
   }
 
   void _startAccelerometer() {
-    if (isCut && !isCooked) {
-      setState(() {
-        kneadCount++;
-        if (kneadCount >= 10) {
-          isCooked = true;
-        }
-      });
-    }
-
+  
     @override
     Widget build(BuildContext context) {
       return Scaffold(
