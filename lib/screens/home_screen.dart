@@ -22,9 +22,11 @@ int meloncount = 0;
 
   Future<void> _loadCount() async{
   final prefs = await SharedPreferences.getInstance();
-  carrotcount = prefs.getInt('carrot')  ?? 0;
-  meloncount = prefs.getInt('melon') ?? 0;
-  pumpkincount = prefs.getInt('pumpkin') ?? 0;
+  setState(() {
+    carrotcount = prefs.getInt('carrot')  ?? 0;
+    meloncount = prefs.getInt('melon') ?? 0;
+    pumpkincount = prefs.getInt('pumpkin') ?? 0;
+  });
   
   }
 
@@ -81,15 +83,16 @@ int meloncount = 0;
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: ()async {
                 int veg = Random().nextInt(3);
                 if(veg==0){
-                Navigator.pushNamed(context, '/game');
+                await Navigator.pushNamed(context, '/game');
                 }else if(veg==1){
-                Navigator.pushNamed(context, '/game/melon');  
+                await Navigator.pushNamed(context, '/game/melon');  
                 }else{
-                Navigator.pushNamed(context, '/game/pumpkin');
+                await Navigator.pushNamed(context, '/game/pumpkin');
                 }
+                _loadCount();
               },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 255, 166, 71),
