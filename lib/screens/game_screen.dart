@@ -34,6 +34,7 @@ class _GameScreenState extends State<GameScreen>
     super.initState();
     _setupAudioContext();
     _playBGM();
+    _playse('furiage.mp3');
 
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
@@ -166,6 +167,10 @@ class _GameScreenState extends State<GameScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Text(
+                  '振り上げろ！',
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
                 Text(
                   '残り時間: $timelimit',
                   style: const TextStyle(

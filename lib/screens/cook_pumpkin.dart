@@ -5,6 +5,8 @@ import 'dart:math';
 import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vibration/vibration.dart';
+
 
 class CookPumpkinScreen extends StatefulWidget {
   const CookPumpkinScreen({super.key});
@@ -71,6 +73,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
         
         // 切る音を再生
         _playse('cut.mp3');
+        Vibration.vibrate(duration: 300);
 
         setState(() {
           _shakeCount++;
@@ -95,6 +98,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
         
         // まぶす音を再生
         _playse('mabushi.mp3');
+        Vibration.vibrate(duration: 100);
 
         setState(() {
           _coatShakeCount++;
@@ -109,6 +113,10 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
             _bgmPlayer.dispose();
             _playse('cook_success.mp3');
             _saveCookedDish();
+            player.onPlayerComplete.listen((event) { 
+              player.dispose();
+  // 指定した処理
+});
           }
         });
 

@@ -94,6 +94,10 @@ flutter:
     - assets/melon_rabbit.png
     - assets/punpkin_rabbit.png
     - assets/krank.png
+    - assets/furiage.mp3
+    - assets/punch.mp3
+    - assets/yokoni.mp3
+    - assets/knife.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
