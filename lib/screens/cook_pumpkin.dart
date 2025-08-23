@@ -33,12 +33,13 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
   int _mashSeconds = 0;
   bool _isMashing = false; 
 
-  final AudioPlayer _bgmPlayer = AudioPlayer();
-  final AudioPlayer _soundPlayer = AudioPlayer();
+  final AudioPlayer _bgmPlayer = AudioPlayer(playerId: "bgm");
+  final player = AudioPlayer(playerId: "se");
 
   @override
   void initState() {
     super.initState();
+    _setupAudioContext();
     _playBGM();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 100),
@@ -64,7 +65,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
         });
         
         // 切る音を再生
-        _soundPlayer.play(AssetSource('cut.mp3'));
+        _playse('cut.mp3');
 
         setState(() {
           _shakeCount++;
@@ -72,7 +73,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
 
           if (_shakeCount >= 5) {
             isCut = true;
-            _soundPlayer.play(AssetSource('complete.mp3'));
+            _playse('complete.mp3');
           }
         });
 
@@ -89,7 +90,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
         });
         
         // まぶす音を再生
-        _soundPlayer.play(AssetSource('shake.mp3'));
+        _playse('shake.mp3');
 
         setState(() {
           _coatShakeCount++;
@@ -97,7 +98,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
           if (_coatShakeCount >= 30) {
             isCoated = true;
             isCooked = true;
-            _soundPlayer.play(AssetSource('complete.mp3'));
+            _playse('cook_success.mp3');
           }
         });
 
@@ -121,7 +122,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
     _mashSeconds = 0;
     
     // つぶし始めの音
-    _soundPlayer.play(AssetSource('mash_start.mp3'));
+    _playse('mash_start.mp3');
     
     _mashTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
@@ -131,7 +132,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
           _mashTimer?.cancel();
           _isMashing = false;
           // つぶし完了音
-          _soundPlayer.play(AssetSource('complete.mp3'));
+          _playse('complete.mp3');
         }
       });
     });
@@ -159,9 +160,30 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
     _kneadTimer?.cancel();
   }
 
+  void _playse(String fileName) async {
+    await player.play(AssetSource(fileName));
+  }
+
   Future<void> _playBGM() async {
     await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
     await _bgmPlayer.play(AssetSource('cook.mp3'));
+  }
+   void _setupAudioContext() async {
+    // グローバルオーディオコンテキストの設定（iOS/Android共通）
+    final audioContext = AudioContext(
+      iOS: AudioContextIOS(
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.music,
+        usageType: AndroidUsageType.media,
+        audioFocus: AndroidAudioFocus.none,
+      ),
+    );
+    
+    await AudioPlayer.global.setAudioContext(audioContext);
   }
 
   @override
@@ -170,7 +192,6 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
     _gyroscopeSubscription?.cancel();
     _animationController.dispose();
     _bgmPlayer.dispose();
-    _soundPlayer.dispose();
     _kneadTimer?.cancel();
     _mashTimer?.cancel();
     super.dispose();
