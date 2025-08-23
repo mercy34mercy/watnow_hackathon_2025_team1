@@ -36,13 +36,22 @@ class _GameScreenState extends State<GameScreen>
     _playBGM();
 
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
 
-    _shakeAnimation = Tween<double>(begin: 0, end: 10).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.elasticIn),
-    );
+    _shakeAnimation =TweenSequence([
+    TweenSequenceItem(
+      tween: Tween<double>(begin: 0, end:-400) // 上へ
+          .chain(CurveTween(curve: Curves.easeOut)),
+      weight: 50,
+    ),
+    TweenSequenceItem(
+      tween: Tween<double>(begin:-400, end: 0) // 戻る
+          .chain(CurveTween(curve: Curves.bounceOut)),
+      weight: 50,
+    ),
+  ]).animate(_animationController);
 
     _startAccelerometer();
     _startTimer();
@@ -55,9 +64,7 @@ class _GameScreenState extends State<GameScreen>
       double magnitude = event.y.abs();
       if (magnitude > 15 && !_isShaking) {
         _isShaking = true;
-        _animationController.forward().then((_) {
-          _animationController.reverse();
-        });
+        _animationController.forward(from: 0);
 
         setState(() {
           _shakeCount++;
@@ -185,14 +192,9 @@ class _GameScreenState extends State<GameScreen>
                   builder: (context, child) {
                     return Transform.translate(
                       offset: Offset(
-                        _shakeAnimation.value *
-                            sin(_animationController.value * pi * 2),
-                        0,
+                        0, _shakeAnimation.value - _carrotPosition
                       ),
-                      child: Transform.translate(
-                        offset: Offset(0, -_carrotPosition),
-                        child: Image.asset('assets/ninzin.png', height: 200),
-                      ),
+                      child:Image.asset('assets/ninzin.png', height: 200) ,
                     );
                   },
                 ),
