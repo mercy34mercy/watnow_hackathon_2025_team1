@@ -16,12 +16,18 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
   late Animation<double> _shakeAnimation;
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   
-  int _shakeCount = 0;
-  bool _isShaking = false;
-  bool _canHarvest = false;
-  double _carrotPosition = 0;
-  final AudioPlayer _bgmPlayer = AudioPlayer(playerId: "bgm");
-  final player = AudioPlayer(playerId: "se");
+  // Cooking phases
+  bool _isVerticalCut = false;
+  bool _isHorizontalCut = false;
+  bool _isFineCutting = false;
+  bool _isShakePhase = false;
+  bool _isCooked = false;
+  
+  int _fineCutCount = 0;
+  int _shakePhaseCount = 0;
+  
+  final AudioPlayer _bgmPlayer = AudioPlayer();
+  final AudioPlayer _soundPlayer = AudioPlayer();
   
   @override
   void initState() {
@@ -47,20 +53,19 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
   
   void _startAccelerometer() {
     _accelerometerSubscription = accelerometerEventStream().listen((event) {
-      double magnitude =  event.y.abs();
-      if (magnitude > 15 && !_isShaking) {
+      double verticalMagnitude = event.y.abs();
+      double horizontalMagnitude = event.x.abs();
+      
+      // フェーズ1: 縦に重く振って切る
+      if (!_isVerticalCut && verticalMagnitude > 20 && !_isShaking) {
         _isShaking = true;
         _animationController.forward().then((_) {
           _animationController.reverse();
         });
+        _soundPlayer.play(AssetSource('cut.mp3'));
         
         setState(() {
-          _shakeCount++;
-          _carrotPosition = min(_shakeCount * 2.0, 20.0);
-          
-          if (_shakeCount >= 8) {
-            _canHarvest = true;
-          }
+          _isVerticalCut = true;
         });
         
         Future.delayed(const Duration(milliseconds: 300), () {
@@ -68,10 +73,70 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
         });
       }
       
-      if (_canHarvest && magnitude > 25) {
+      // フェーズ2: 横に重く振って切る
+      else if (_isVerticalCut && !_isHorizontalCut && horizontalMagnitude > 20 && !_isShaking) {
+        _isShaking = true;
+        _animationController.forward().then((_) {
+          _animationController.reverse();
+        });
+        _soundPlayer.play(AssetSource('cut.mp3'));
+        
+        setState(() {
+          _isHorizontalCut = true;
+          _isFineCutting = true;
+        });
+        
+        Future.delayed(const Duration(milliseconds: 300), () {
+          _isShaking = false;
+        });
+      }
+      
+      // フェーズ3: 軽く縦に振って細かく切る
+      else if (_isFineCutting && !_isShakePhase && verticalMagnitude > 8 && !_isShaking) {
+        _isShaking = true;
+        _animationController.forward().then((_) {
+          _animationController.reverse();
+        });
+        _soundPlayer.play(AssetSource('cut.mp3'));
+        
+        setState(() {
+          _fineCutCount++;
+          if (_fineCutCount >= 5) {
+            _isFineCutting = false;
+            _isShakePhase = true;
+          }
+        });
+        
+        Future.delayed(const Duration(milliseconds: 200), () {
+          _isShaking = false;
+        });
+      }
+      
+      // フェーズ4: シェイク（30回縦に細かく振る）
+      else if (_isShakePhase && !_isCooked && verticalMagnitude > 8 && !_isShaking) {
+        _isShaking = true;
+        _animationController.forward().then((_) {
+          _animationController.reverse();
+        });
+        _soundPlayer.play(AssetSource('shake.mp3'));
+        
+        setState(() {
+          _shakePhaseCount++;
+          if (_shakePhaseCount >= 30) {
+            _isCooked = true;
+            _soundPlayer.play(AssetSource('complete.mp3'));
+          }
+        });
+        
+        Future.delayed(const Duration(milliseconds: 100), () {
+          _isShaking = false;
+        });
+      }
+      
+      if (_canHarvest && verticalMagnitude > 25) {
         _accelerometerSubscription?.cancel();
         if (mounted) {
-          Navigator.pushReplacementNamed(context, '/result');
+          Navigator.pushReplacementNamed(context, '/result/melon');
         }
       }
     });
@@ -105,6 +170,7 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
     _accelerometerSubscription?.cancel();
     _animationController.dispose();
     _bgmPlayer.dispose();
+    _soundPlayer.dispose();
     super.dispose();
   }
   
@@ -123,24 +189,100 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
               color: Colors.brown[600],
             ),
           ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 45,
+            child: _isCooked
+                ? Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/');
+                      },
+                      child: Text('ホーム画面に戻る', style: TextStyle(fontSize: 20)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(
+                          255,
+                          255,
+                          166,
+                          71,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                      ),
+                    ),
+                  )
+                : SizedBox(),
+          ),
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  '振った回数: $_shakeCount',
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    _isCooked
+                        ? SizedBox(height: 0)
+                        : Image.asset('assets/bikkurisen.png', width: 300),
+                    Text(
+                      _isCooked
+                          ? 'できあがりました!'
+                          : _isShakePhase
+                              ? 'シェイクせよ!'
+                              : _isFineCutting
+                                  ? '細かく切れ!'
+                                  : _isHorizontalCut
+                                      ? '準備完了!'
+                                      : _isVerticalCut
+                                          ? '横に切れ!'
+                                          : '縦に切れ!',
+                      style: TextStyle(
+                        fontSize: _isCooked ? 33 : 36,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                if (_canHarvest)
-                  const Text(
-                    '思いっきり振り上げて収穫！',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.red,
+                const SizedBox(height: 30),
+                if (!_isVerticalCut) ...[
+                  Text(
+                    '縦に重く振って切る',
+                    style: const TextStyle(
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                ],
+                if (_isVerticalCut && !_isHorizontalCut) ...[
+                  Text(
+                    '横に重く振って切る',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+                if (_isFineCutting) ...[
+                  Text(
+                    '軽く縦に振る: $_fineCutCount / 5',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+                if (_isShakePhase && !_isCooked) ...[
+                  Text(
+                    'シェイク: $_shakePhaseCount / 30',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 40),
                 AnimatedBuilder(
                   animation: _shakeAnimation,
@@ -150,7 +292,9 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
                       child: Transform.translate(
                         offset: Offset(0, -_carrotPosition),
                         child: Image.asset(
-                          'assets/melonjuice.png',
+                          _isCooked
+                              ? 'assets/melonjuice.png'
+                              : 'assets/melon.png',
                           height: 300,
                         ),
                       ),
