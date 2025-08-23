@@ -34,17 +34,28 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
     _setupAudioContext();
     _playBGM();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
     
-    _shakeAnimation = Tween<double>(
-      begin: 0,
-      end: 10,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticIn,
-    ));
+    _shakeAnimation = TweenSequence<double>([
+    TweenSequenceItem(
+      tween: Tween(begin: 0.0, end: -200.0).chain(CurveTween(curve: Curves.easeOut)),
+      weight: 1,
+    ),
+    TweenSequenceItem(
+      tween: Tween(begin: -200.0, end: 200.0).chain(CurveTween(curve: Curves.easeInOut)),
+      weight: 2,
+    ),
+    TweenSequenceItem(
+      tween: Tween(begin:200.0, end: -100.0).chain(CurveTween(curve: Curves.easeInOut)),
+      weight: 2,
+    ),
+    TweenSequenceItem(
+      tween: Tween(begin: -100.0, end: 0.0).chain(CurveTween(curve: Curves.easeOut)),
+      weight: 1,
+    ),
+  ]).animate(_animationController);
     
     _startAccelerometer();
     _startTimer();
@@ -56,9 +67,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
       
       if (magnitude > 15 && !_isShaking) {
         _isShaking = true;
-        _animationController.forward().then((_) {
-          _animationController.reverse();
-        });
+        _animationController.forward(from: 0);
         
         setState(() {
           _shakeCount++;
