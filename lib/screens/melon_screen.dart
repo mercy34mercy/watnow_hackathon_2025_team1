@@ -4,6 +4,8 @@ import 'dart:async';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:vibration/vibration.dart';
+
 
 class GameMelonScreen extends StatefulWidget {
   const GameMelonScreen({super.key});
@@ -58,6 +60,8 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
         
         setState(() {
           _shakeCount++;
+          Vibration.vibrate(duration: 300);
+          _sePlayer.play(AssetSource('cut.mp3'));
           _carrotPosition = min(_shakeCount * 2.0, 20.0);
           
           if (_shakeCount >= 8) {
@@ -76,6 +80,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
           final prefs = await SharedPreferences.getInstance();
           var meloncount = prefs.getInt('melon') ?? 0;
           meloncount += 1;
+          Vibration.vibrate(duration: 1000);
           await prefs.setInt('melon', meloncount);
           _sePlayer.play(AssetSource('harvest_success.mp3'));
           Navigator.pushReplacementNamed(context, '/result/melon');

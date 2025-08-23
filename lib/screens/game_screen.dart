@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:vibration/vibration.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -12,11 +13,12 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateMixin {
+class _GameScreenState extends State<GameScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _shakeAnimation;
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
-  
+
   int _shakeCount = 0;
   int timelimit = 30;
   bool _isShaking = false;
@@ -24,80 +26,87 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   double _carrotPosition = 0;
 
   final AudioPlayer _bgmPlayer = AudioPlayer();
-  final AudioPlayer _sePlayer = AudioPlayer();
-  
+
   @override
   void initState() {
     super.initState();
     _playBGM();
-    
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 100),
       vsync: this,
     );
-    
-    _shakeAnimation = Tween<double>(
-      begin: 0,
-      end: 10,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticIn,
-    ));
-    
+
+    _shakeAnimation = Tween<double>(begin: 0, end: 10).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticIn),
+    );
+
     _startAccelerometer();
     _startTimer();
   }
-  
+
   void _startAccelerometer() {
-    _accelerometerSubscription = accelerometerEventStream().listen((event) async {
-      double magnitude =  event.y.abs();
+    _accelerometerSubscription = accelerometerEventStream().listen((
+      event,
+    ) async {
+      double magnitude = event.y.abs();
       if (magnitude > 15 && !_isShaking) {
         _isShaking = true;
         _animationController.forward().then((_) {
           _animationController.reverse();
         });
-        
+
         setState(() {
           _shakeCount++;
+          Vibration.vibrate(duration: 300);
+          _playse('gasagasa.mp3');
           _carrotPosition = min(_shakeCount * 2.0, 20.0);
-          
+
           if (_shakeCount >= 8) {
             _canHarvest = true;
           }
         });
-        
+
         Future.delayed(const Duration(milliseconds: 300), () {
           _isShaking = false;
         });
       }
-      
+
       if (_canHarvest && magnitude > 25) {
         _accelerometerSubscription?.cancel();
         if (mounted) {
           final prefs = await SharedPreferences.getInstance();
           var carrotcount = prefs.getInt('carrot') ?? 0;
           carrotcount += 1;
+          Vibration.vibrate(duration: 1000);
           await prefs.setInt('carrot', carrotcount);
-          _sePlayer.play(AssetSource('harvest_success.mp3'));
+          _playse('harvest_success.mp3');
           Navigator.pushReplacementNamed(context, '/result');
         }
       }
     });
   }
+
   void _startTimer() {
-  Timer.periodic(const Duration(seconds: 1), (timer) {
-    if (timelimit > 0) {
-      setState(() {
-        timelimit--;
-      });
-    } else {
-      timer.cancel();
-      _sePlayer.play(AssetSource('bad_smell.mp3')); 
-       Navigator.pushReplacementNamed(context, '/result/failed/carrot');
-    }
-  });
-}
-  Future<void> _playBGM() async{
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (timelimit > 0) {
+        setState(() {
+          timelimit--;
+        });
+      } else {
+        timer.cancel();
+        _playse('bad_smell.mp3');
+        Navigator.pushReplacementNamed(context, '/result/failed/carrot');
+      }
+    });
+  }
+
+  final player = AudioPlayer();
+  void _playse(String fileName) async {
+    await player.play(AssetSource(fileName));
+  }
+
+  Future<void> _playBGM() async {
     await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
     await _bgmPlayer.play(AssetSource('harvest.mp3'));
   }
@@ -109,7 +118,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     _bgmPlayer.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,9 +130,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             left: 0,
             right: 0,
             height: 150,
-            child: Container(
-              color: Colors.brown[600],
-            ),
+            child: Container(color: Colors.brown[600]),
           ),
           Center(
             child: Column(
@@ -131,11 +138,17 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               children: [
                 Text(
                   '残り時間: $timelimit',
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text(
                   '振った回数: $_shakeCount',
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 if (_canHarvest)
@@ -152,13 +165,14 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                   animation: _shakeAnimation,
                   builder: (context, child) {
                     return Transform.translate(
-                      offset: Offset(_shakeAnimation.value * sin(_animationController.value * pi * 2), 0),
+                      offset: Offset(
+                        _shakeAnimation.value *
+                            sin(_animationController.value * pi * 2),
+                        0,
+                      ),
                       child: Transform.translate(
                         offset: Offset(0, -_carrotPosition),
-                        child: Image.asset(
-                          'assets/ninzin.png',
-                          height: 200,
-                        ),
+                        child: Image.asset('assets/ninzin.png', height: 200),
                       ),
                     );
                   },

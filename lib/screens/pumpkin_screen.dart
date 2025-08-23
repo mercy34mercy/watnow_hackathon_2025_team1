@@ -4,6 +4,8 @@ import 'dart:async';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:vibration/vibration.dart';
+
 
 class GamePumpkinScreen extends StatefulWidget {
   const GamePumpkinScreen({super.key});
@@ -59,6 +61,8 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
         
         setState(() {
           _shakeCount++;
+          Vibration.vibrate(duration: 300);
+          _sePlayer.play(AssetSource('gasagasa.mp3'));
           _carrotPosition = min(_shakeCount * 2.0, 20.0);
           
           if (_shakeCount >= 8) {
@@ -77,6 +81,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
           final prefs = await SharedPreferences.getInstance();
           var pumpkincount = prefs.getInt('pumpkin') ?? 0;
           pumpkincount += 1;
+          Vibration.vibrate(duration: 1000);
           await prefs.setInt('pumpkin', pumpkincount);
           _sePlayer.play(AssetSource('harvest_success.mp3'));
           Navigator.pushReplacementNamed(context, '/result/pumpkin');
