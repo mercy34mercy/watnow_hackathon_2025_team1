@@ -3,6 +3,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:vibration/vibration.dart';
 
 class CookMelonScreen extends StatefulWidget {
   const CookMelonScreen({super.key});
@@ -65,6 +66,7 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
           _animationController.reverse();
         });
         _playse('melon_firstcut.mp3');
+        Vibration.vibrate(duration: 500);
         
         setState(() {
           _isVerticalCut = true;
@@ -82,6 +84,7 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
           _animationController.reverse();
         });
         _playse('melon_firstcut.mp3');
+        Vibration.vibrate(duration: 500);
         
         setState(() {
           _isHorizontalCut = true;
@@ -100,6 +103,7 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
           _animationController.reverse();
         });
         _playse('melon_cut.mp3');
+        Vibration.vibrate(duration: 200);
         
         setState(() {
           _fineCutCount++;
@@ -121,6 +125,7 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
           _animationController.reverse();
         });
         _playse('melon_shake.mp3');
+        Vibration.vibrate(duration: 100);
         
         setState(() {
           _shakePhaseCount++;
@@ -128,7 +133,12 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
             _isCooked = true;
             _bgmPlayer.dispose();
             
+            
             _playse('cook_success.mp3');
+            player.onPlayerComplete.listen((event) { 
+              player.dispose();
+  // 指定した処理
+});
           }
         });
         

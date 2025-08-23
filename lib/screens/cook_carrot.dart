@@ -3,6 +3,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:vibration/vibration.dart';
 
 class CookCarrotScreen extends StatefulWidget {
   const CookCarrotScreen({super.key});
@@ -54,6 +55,10 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
             isCooked = true;
             _playse('cook_success.mp3');
             _bgmPlayer.dispose();
+            player.onPlayerComplete.listen((event) { 
+              player.dispose();
+  // 指定した処理
+});
           }
         });
       }
@@ -86,6 +91,7 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
         setState(() {
           _shakeCount++;
           _playse('cut.mp3');
+          Vibration.vibrate(duration: 300);
           _carrotPosition = min(_shakeCount * 2.0, 20.0);
 
           if (_shakeCount >= 5) {
@@ -243,26 +249,41 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
                     ),
                   const SizedBox(height: 40),
                   AnimatedBuilder(
-                    animation: _shakeAnimation,
-                    builder: (context, child) {
-                      return Transform.translate(
-                        offset: Offset(
-                          _shakeAnimation.value *
-                              sin(_animationController.value * pi * 2),
-                          0,
-                        ),
-                        child: Transform.translate(
-                          offset: Offset(0, -_carrotPosition),
-                          child: Image.asset(
-                            isCooked
-                                ? 'assets/carrotcake.png'
-                                : 'assets/ninzin.png',
-                            height: isCooked ? 500 : 200,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+  animation: _shakeAnimation,
+  builder: (context, child) {
+    return Transform.translate(
+      offset: Offset(
+        _shakeAnimation.value * sin(_animationController.value * pi * 2),
+        0,
+      ),
+      child: Transform.translate(
+        offset: Offset(0, -_carrotPosition),
+        child: Stack(
+  alignment: Alignment.bottomCenter,
+  clipBehavior: Clip.none,
+  children: [
+    // 🥕 人参を先に描画
+    Image.asset(
+      isCooked ? 'assets/carrotcake.png' : 'assets/ninzin.png',
+      height: isCooked ? 500 : 200,
+    ),
+
+    // 🔪 ナイフを上に描画
+    if (!isCooked)
+    Positioned(
+      bottom: (isCooked ? 500 : 200) - 50, // ← 位置は調整してね
+      child: Image.asset(
+        'assets/knife.png',
+        width: 150,
+      ),
+    ),
+  ],
+),
+
+      ),
+    );
+  },
+),
                 ],
               ),
             ),
