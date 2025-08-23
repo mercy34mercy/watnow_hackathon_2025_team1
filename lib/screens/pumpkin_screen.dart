@@ -4,6 +4,8 @@ import 'dart:async';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:vibration/vibration.dart';
+
 
 class GamePumpkinScreen extends StatefulWidget {
   const GamePumpkinScreen({super.key});
@@ -22,8 +24,8 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
   bool _isShaking = false;
   bool _canHarvest = false;
   double _carrotPosition = 0;
-  final AudioPlayer _bgmPlayer = AudioPlayer();
-  final AudioPlayer _sePlayer = AudioPlayer();
+  final AudioPlayer _bgmPlayer = AudioPlayer(playerId: "bgm");
+  final player = AudioPlayer(playerId: "se");
   
   @override
   void initState() {
@@ -59,6 +61,8 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
         
         setState(() {
           _shakeCount++;
+          Vibration.vibrate(duration: 300);
+          _playse('gasagasa.mp3');
           _carrotPosition = min(_shakeCount * 2.0, 20.0);
           
           if (_shakeCount >= 8) {
@@ -77,8 +81,9 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
           final prefs = await SharedPreferences.getInstance();
           var pumpkincount = prefs.getInt('pumpkin') ?? 0;
           pumpkincount += 1;
+          Vibration.vibrate(duration: 1000);
           await prefs.setInt('pumpkin', pumpkincount);
-          _sePlayer.play(AssetSource('harvest_success.mp3'));
+          _playse('harvest_success.mp3');
           Navigator.pushReplacementNamed(context, '/result/pumpkin');
         }
       }
@@ -92,7 +97,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
       });
     } else {
       timer.cancel();
-      _sePlayer.play(AssetSource('bad_smell.mp3'));
+      _playse('bad_smell.mp3');
       // 0 になったらタイマーを止める
       // 必要ならここでリザルト画面に遷移するなどの処理
       Navigator.pushReplacementNamed(context, '/result/failed/pumpkin');
@@ -102,6 +107,26 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
   Future<void> _playBGM() async{
     await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
     await _bgmPlayer.play(AssetSource('harvest.mp3'));
+  }
+  void _playse(String fileName) async {
+    await player.play(AssetSource(fileName));
+  }
+  void _setupAudioContext() async {
+    // グローバルオーディオコンテキストの設定（iOS/Android共通）
+    final audioContext = AudioContext(
+      iOS: AudioContextIOS(
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.music,
+        usageType: AndroidUsageType.media,
+        audioFocus: AndroidAudioFocus.none,
+      ),
+    );
+    
+    await AudioPlayer.global.setAudioContext(audioContext);
   }
   @override
   void dispose() {
