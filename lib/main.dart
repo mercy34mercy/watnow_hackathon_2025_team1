@@ -13,10 +13,14 @@ import 'screens/failed_melon.dart';
 import 'screens/cook_carrot.dart';
 import 'screens/cook_melon.dart';
 import 'screens/cook_pumpkin.dart';
+import 'screens/ranking_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
+  prefs.setInt('carrotcake', 6);
+  prefs.setInt('melonjuice', 6);
+  prefs.setInt('pumpkinsoup', 6);
   final int? carrot = prefs.getInt('carrot');
   if (carrot == null) {
     // 一度もsetIntされてない　
@@ -60,7 +64,8 @@ class MyApp extends StatelessWidget {
         '/game/pumpkin': (context) => const GamePumpkinScreen(),
         '/cook/carrotcake':(context) => const CookCarrotScreen(),
       '/cook/melonjuice' :(context) => const CookMelonScreen(),
-        '/cook/pumpkinsoup' :(context) => const CookPumpkinScreen()
+        '/cook/pumpkinsoup' :(context) => const CookPumpkinScreen(),
+        '/ranking': (context) => const RankingScreen(),
       },
     );
   }

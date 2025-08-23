@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
+import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CookCarrotScreen extends StatefulWidget {
   const CookCarrotScreen({super.key});
@@ -24,6 +26,8 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
   bool isCooked = false;
   bool isCut = false;
   int kneadCount = 0;
+  DateTime? startTime;  // 料理開始時間を記録
+  double? completionTime;  // 完成時の記録時間
   final AudioPlayer _bgmPlayer = AudioPlayer(playerId: "bgm");
   final player = AudioPlayer(playerId: "se");
   @override
@@ -31,6 +35,7 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
     super.initState();
     _setupAudioContext();
     _playBGM();
+    startTime = DateTime.now();  // タイマー開始
 
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 100),
@@ -52,8 +57,13 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
           _playse('press.mp3');
           if (kneadCount >= 10) {
             isCooked = true;
+            // 完成時の時間を記録
+            if (startTime != null) {
+              completionTime = DateTime.now().difference(startTime!).inMilliseconds.toDouble();
+            }
             _playse('cook_success.mp3');
             _bgmPlayer.dispose();
+            _saveCookedDish();
           }
         });
       }
@@ -114,6 +124,41 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
   Future<void> _playBGM() async {
     await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
     await _bgmPlayer.play(AssetSource('cook.mp3'));
+  }
+
+  Future<void> _saveCookedDish() async {
+    final prefs = await SharedPreferences.getInstance();
+    int carrotCount = prefs.getInt('carrot') ?? 0;
+    int carrotCakeCount = prefs.getInt('carrotcake') ?? 0;
+    
+    if (carrotCount > 0) {
+      await prefs.setInt('carrot', carrotCount - 1);
+      await prefs.setInt('carrotcake', carrotCakeCount + 1);
+    }
+    
+    // completionTimeが既に計算されているのでそれを使用
+    if (completionTime != null) {
+      // 記録リストを取得
+      String? recordsJson = prefs.getString('carrotcake_records');
+      List<double> records = [];
+      
+      if (recordsJson != null) {
+        List<dynamic> decoded = jsonDecode(recordsJson);
+        records = decoded.map((e) => e as double).toList();
+      }
+      
+      // 新しい記録を追加（completionTimeを使用）
+      records.add(completionTime!);
+      records.sort();
+      
+      // トップ10の記録のみ保存
+      if (records.length > 10) {
+        records = records.take(10).toList();
+      }
+      
+      // 保存
+      await prefs.setString('carrotcake_records', jsonEncode(records));
+    }
   }
 
   void _setupAudioContext() async {
@@ -195,17 +240,43 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
                       isCooked
                           ? SizedBox(height: 0)
                           : Image.asset('assets/bikkurisen.png', width: 300),
-                      Text(
-                        isCut
-                            ? isCooked
-                                  ? 'できあがりました!'
-                                  : 'こねろ!'
-                            : '切れ!',
-                        style: TextStyle(
-                          fontSize: isCooked ? 33 : 66,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
+                      Column(
+                        children: [
+                          Text(
+                            isCut
+                                ? isCooked
+                                      ? 'できあがりました!'
+                                      : 'こねろ!'
+                                : '切れ!',
+                            style: TextStyle(
+                              fontSize: isCooked ? 33 : 66,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          if (isCooked && completionTime != null) ...[
+                            const SizedBox(height: 10),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.yellow[100],
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.orange,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Text(
+                                '記録: ${(completionTime! / 1000).toStringAsFixed(2)}秒',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ],
                   ),

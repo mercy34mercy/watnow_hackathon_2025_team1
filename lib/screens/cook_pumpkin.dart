@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
+import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CookPumpkinScreen extends StatefulWidget {
   const CookPumpkinScreen({super.key});
@@ -32,6 +34,8 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
   Timer? _mashTimer;
   int _mashSeconds = 0;
   bool _isMashing = false; 
+  DateTime? startTime;  // 料理開始時間を記録
+  double? completionTime;  // 完成時の記録時間
 
   final AudioPlayer _bgmPlayer = AudioPlayer(playerId: "bgm");
   final player = AudioPlayer(playerId: "se");
@@ -41,6 +45,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
     super.initState();
     _setupAudioContext();
     _playBGM();
+    startTime = DateTime.now();  // タイマー開始
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 100),
       vsync: this,
@@ -97,8 +102,13 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
           if (_coatShakeCount >= 30) {
             isCoated = true;
             isCooked = true;
+            // 完成時の時間を記録
+            if (startTime != null) {
+              completionTime = DateTime.now().difference(startTime!).inMilliseconds.toDouble();
+            }
             _bgmPlayer.dispose();
             _playse('cook_success.mp3');
+            _saveCookedDish();
           }
         });
 
@@ -158,6 +168,41 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
 
   void _stopKneading() {
     _kneadTimer?.cancel();
+  }
+
+  Future<void> _saveCookedDish() async {
+    final prefs = await SharedPreferences.getInstance();
+    int pumpkinCount = prefs.getInt('pumpkin') ?? 0;
+    int pumpkinSoupCount = prefs.getInt('pumpkinsoup') ?? 0;
+    
+    if (pumpkinCount > 0) {
+      await prefs.setInt('pumpkin', pumpkinCount - 1);
+      await prefs.setInt('pumpkinsoup', pumpkinSoupCount + 1);
+    }
+    
+    // completionTimeが既に計算されているのでそれを使用
+    if (completionTime != null) {
+      // 記録リストを取得
+      String? recordsJson = prefs.getString('pumpkinsoup_records');
+      List<double> records = [];
+      
+      if (recordsJson != null) {
+        List<dynamic> decoded = jsonDecode(recordsJson);
+        records = decoded.map((e) => e as double).toList();
+      }
+      
+      // 新しい記録を追加（completionTimeを使用）
+      records.add(completionTime!);
+      records.sort();
+      
+      // トップ10の記録のみ保存
+      if (records.length > 10) {
+        records = records.take(10).toList();
+      }
+      
+      // 保存
+      await prefs.setString('pumpkinsoup_records', jsonEncode(records));
+    }
   }
 
   void _playse(String fileName) async {
@@ -249,19 +294,45 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
                         ? SizedBox(height: 0)
                         : Image.asset('assets/bikkurisen.png', width: 300),
 
-                    Text(
-                      isCooked
-                          ? 'できあがりました!'
-                          : isMashed
-                              ? 'まぶせ!'
-                              : isCut
-                                  ? 'つぶせ!'
-                                  : '切れ!',
-                      style: TextStyle(
-                        fontSize: isCooked ? 33 : 50,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
+                    Column(
+                      children: [
+                        Text(
+                          isCooked
+                              ? 'できあがりました!'
+                              : isMashed
+                                  ? 'まぶせ!'
+                                  : isCut
+                                      ? 'つぶせ!'
+                                      : '切れ!',
+                          style: TextStyle(
+                            fontSize: isCooked ? 33 : 50,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (isCooked && completionTime != null) ...[
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.yellow[100],
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.orange,
+                                width: 2,
+                              ),
+                            ),
+                            child: Text(
+                              '記録: ${(completionTime! / 1000).toStringAsFixed(2)}秒',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
