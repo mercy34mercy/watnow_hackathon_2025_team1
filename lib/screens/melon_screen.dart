@@ -93,6 +93,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
           meloncount += 1;
           Vibration.vibrate(duration: 1000);
           await prefs.setInt('melon', meloncount);
+          _bgmPlayer.dispose();
           _playse('harvest_success.mp3');
           Navigator.pushReplacementNamed(context, '/result/melon');
         }
@@ -108,6 +109,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
     } else {
       timer.cancel(); 
       _playse('bad_smell.mp3');
+      _bgmPlayer.dispose();
       // 0 になったらタイマーを止める
       // 必要ならここでリザルト画面に遷移するなどの処理
       Navigator.pushReplacementNamed(context, '/result/failed/melon');

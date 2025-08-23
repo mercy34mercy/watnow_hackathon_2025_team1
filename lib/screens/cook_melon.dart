@@ -16,11 +16,6 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
   late Animation<double> _shakeAnimation;
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   
-  int _shakeCount = 0;
-  bool _isShaking = false;
-  bool _canHarvest = false;
-  double _carrotPosition = 0;
-  
   // Cooking phases
   bool _isVerticalCut = false;
   bool _isHorizontalCut = false;
@@ -37,6 +32,7 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
   @override
   void initState() {
     super.initState();
+    _setupAudioContext();
     _playBGM();
     
     _animationController = AnimationController(
@@ -145,9 +141,29 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
       }
     });
   }
+  void _playse(String fileName) async {
+    await player.play(AssetSource(fileName));
+  }
   Future<void> _playBGM() async{
     await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
     await _bgmPlayer.play(AssetSource('cook.mp3'));
+  }
+  void _setupAudioContext() async {
+    // グローバルオーディオコンテキストの設定（iOS/Android共通）
+    final audioContext = AudioContext(
+      iOS: AudioContextIOS(
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.music,
+        usageType: AndroidUsageType.media,
+        audioFocus: AndroidAudioFocus.none,
+      ),
+    );
+    
+    await AudioPlayer.global.setAudioContext(audioContext);
   }
   @override
   void dispose() {

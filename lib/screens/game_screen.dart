@@ -90,6 +90,7 @@ class _GameScreenState extends State<GameScreen>
           carrotcount += 1;
           Vibration.vibrate(duration: 1000);
           await prefs.setInt('carrot', carrotcount);
+          _bgmPlayer.dispose();
           _playse('harvest_success.mp3');
           Navigator.pushReplacementNamed(context, '/result');
         }
@@ -106,6 +107,7 @@ class _GameScreenState extends State<GameScreen>
       } else {
         timer.cancel();
         _playse('bad_smell.mp3');
+        _bgmPlayer.dispose();
         Navigator.pushReplacementNamed(context, '/result/failed/carrot');
       }
     });
@@ -123,8 +125,10 @@ class _GameScreenState extends State<GameScreen>
     // グローバルオーディオコンテキストの設定（iOS/Android共通）
     final audioContext = AudioContext(
       iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
         options: {
           AVAudioSessionOptions.mixWithOthers,
+          AVAudioSessionOptions.defaultToSpeaker,
         },
       ),
       android: AudioContextAndroid(
