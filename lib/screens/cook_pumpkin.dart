@@ -73,7 +73,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
 
           if (_shakeCount >= 5) {
             isCut = true;
-            _playse('complete.mp3');
+            _playse('cook_success.mp3');
           }
         });
 
@@ -90,7 +90,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
         });
         
         // まぶす音を再生
-        _playse('shake.mp3');
+        _playse('mabushi.mp3');
 
         setState(() {
           _coatShakeCount++;
@@ -122,7 +122,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
     _mashSeconds = 0;
     
     // つぶし始めの音
-    _playse('mash_start.mp3');
+    _playse('press.mp3');
     
     _mashTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
@@ -132,7 +132,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
           _mashTimer?.cancel();
           _isMashing = false;
           // つぶし完了音
-          _playse('complete.mp3');
+          _playse('cook_success.mp3');
         }
       });
     });
@@ -219,6 +219,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/');
+                        _bgmPlayer.dispose();
                       },
                       child: Text('ホーム画面に戻る', style: TextStyle(fontSize: 20)),
                       style: ElevatedButton.styleFrom(

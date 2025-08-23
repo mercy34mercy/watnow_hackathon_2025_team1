@@ -92,6 +92,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
           pumpkincount += 1;
           Vibration.vibrate(duration: 1000);
           await prefs.setInt('pumpkin', pumpkincount);
+          _bgmPlayer.dispose();
           _playse('harvest_success.mp3');
           Navigator.pushReplacementNamed(context, '/result/pumpkin');
         }
@@ -107,6 +108,7 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
     } else {
       timer.cancel();
       _playse('bad_smell.mp3');
+      _bgmPlayer.dispose();
       // 0 になったらタイマーを止める
       // 必要ならここでリザルト画面に遷移するなどの処理
       Navigator.pushReplacementNamed(context, '/result/failed/pumpkin');
