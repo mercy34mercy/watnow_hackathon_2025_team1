@@ -50,9 +50,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildItemCounter('assets/melon.png', meloncount),
-                  _buildItemCounter('assets/ninzin.png', carrotcount),
-                  _buildItemCounter('assets/pumpkin.png', pumpkincount),
+                  _buildItemCounter('assets/melon.png', meloncount, '/cook/melonjuice'),
+                  _buildItemCounter('assets/ninzin.png', carrotcount, '/cook/carrotcake'),
+                  _buildItemCounter('assets/pumpkin.png', pumpkincount, '/cook/pumpkinsoup'),
                 ],
               ),
             ),
@@ -66,50 +66,31 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(24.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: ()async {
-                int veg = Random().nextInt(3);
-                await _sePlayer.play(AssetSource('taiko.mp3'));
-                await _sePlayer.onPlayerComplete.first;
-                _bgmPlayer.dispose();
-                if(veg==0){
-                await Navigator.pushNamed(context, '/game');
-                }else if(veg==1){
-                await Navigator.pushNamed(context, '/game/melon');  
-                }else{
-                await Navigator.pushNamed(context, '/game/pumpkin');
-                }
-                _loadCount();
-              },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 255, 166, 71),
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                    ),
-                    child: const Text(
-                      '畑ガチャ',
-                      style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 255, 255, 255)),
-                    ),
+              child: Center(
+                child: ElevatedButton(
+                  onPressed: ()async {
+                    int veg = Random().nextInt(3);
+                    await _sePlayer.play(AssetSource('taiko.mp3'));
+                    await _sePlayer.onPlayerComplete.first;
+                    _bgmPlayer.dispose();
+                    if(veg==0){
+                      await Navigator.pushNamed(context, '/game');
+                    }else if(veg==1){
+                      await Navigator.pushNamed(context, '/game/melon');  
+                    }else{
+                      await Navigator.pushNamed(context, '/game/pumpkin');
+                    }
+                    _loadCount();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 255, 166, 71),
+                    padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      _bgmPlayer.dispose();
-                      await _sePlayer.play(AssetSource('taiko.mp3'));
-                      await _sePlayer.onPlayerComplete.first;
-                      Navigator.pushNamed(context, '/cook/pumpkinsoup');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                    ),
-                    child: const Text(
-                      '料理',
-                      style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 255, 255, 255)),
-                    ),
+                  child: const Text(
+                    '畑ガチャ',
+                    style: TextStyle(fontSize: 22, color: Color.fromARGB(255, 255, 255, 255)),
                   ),
-                ],
+                ),
               ),
             ),
           ],
@@ -118,32 +99,52 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildItemCounter(String imagePath, int count) {
-    return Column(
-      children: [
-        Image.asset(
-          imagePath,
-          height: 50,
-          width: 50,
-        ),
-        const SizedBox(height: 4),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color.fromARGB(255, 255, 166, 71), width: 2),
-          ),
-          child: Text(
-            '×$count',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 255, 166, 71),
+  Widget _buildItemCounter(String imagePath, int count, String route) {
+    final bool isEnabled = count > 0;
+    
+    return GestureDetector(
+      onTap: isEnabled ? () async {
+        _bgmPlayer.dispose();
+        await _sePlayer.play(AssetSource('taiko.mp3'));
+        await _sePlayer.onPlayerComplete.first;
+        Navigator.pushNamed(context, route);
+      } : null,
+      child: Column(
+        children: [
+          Opacity(
+            opacity: isEnabled ? 1.0 : 0.5,
+            child: Image.asset(
+              imagePath,
+              height: 50,
+              width: 50,
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: isEnabled ? Colors.white : Colors.grey[300],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isEnabled 
+                    ? const Color.fromARGB(255, 255, 166, 71) 
+                    : Colors.grey,
+                width: 2,
+              ),
+            ),
+            child: Text(
+              '×$count',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isEnabled 
+                    ? const Color.fromARGB(255, 255, 166, 71)
+                    : Colors.grey,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
