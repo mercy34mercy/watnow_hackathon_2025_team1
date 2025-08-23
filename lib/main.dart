@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
         '/result/failed/melon':(context) => const FailedMelon(),
         '/game/pumpkin': (context) => const GamePumpkinScreen(),
         '/cook/carrotcake':(context) => const CookCarrotScreen(),
-        '/cook/melonjuice' :(context) => const CookMelonScreen(),
+      '/cook/melonjuice' :(context) => const CookMelonScreen(),
         '/cook/pumpkinsoup' :(context) => const CookPumpkinScreen()
       },
     );

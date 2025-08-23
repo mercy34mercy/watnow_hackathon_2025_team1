@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _bgmPlayer.dispose();
                       await _sePlayer.play(AssetSource('taiko.mp3'));
                       await _sePlayer.onPlayerComplete.first;
-                      Navigator.pushNamed(context, '/cook/pumpkinsoup');
+                      Navigator.pushNamed(context, '/cook/melonjuice');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
