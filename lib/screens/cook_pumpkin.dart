@@ -98,6 +98,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
           if (_coatShakeCount >= 30) {
             isCoated = true;
             isCooked = true;
+            _bgmPlayer.dispose();
             _playse('cook_success.mp3');
           }
         });

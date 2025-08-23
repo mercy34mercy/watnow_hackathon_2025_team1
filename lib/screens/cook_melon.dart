@@ -22,12 +22,14 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
   bool _isFineCutting = false;
   bool _isShakePhase = false;
   bool _isCooked = false;
+  bool _isShaking = false;
+  bool _canHarvest = false;
   
   int _fineCutCount = 0;
   int _shakePhaseCount = 0;
   
-  final AudioPlayer _bgmPlayer = AudioPlayer();
-  final AudioPlayer _soundPlayer = AudioPlayer();
+  final AudioPlayer _bgmPlayer = AudioPlayer(playerId: "bgm");
+  final player = AudioPlayer(playerId: "se");
   
   @override
   void initState() {
@@ -62,7 +64,7 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
         _animationController.forward().then((_) {
           _animationController.reverse();
         });
-        _soundPlayer.play(AssetSource('cut.mp3'));
+        _playse('melon_firstcut.mp3');
         
         setState(() {
           _isVerticalCut = true;
@@ -79,7 +81,7 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
         _animationController.forward().then((_) {
           _animationController.reverse();
         });
-        _soundPlayer.play(AssetSource('cut.mp3'));
+        _playse('melon_firstcut.mp3');
         
         setState(() {
           _isHorizontalCut = true;
@@ -97,7 +99,7 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
         _animationController.forward().then((_) {
           _animationController.reverse();
         });
-        _soundPlayer.play(AssetSource('cut.mp3'));
+        _playse('melon_cut.mp3');
         
         setState(() {
           _fineCutCount++;
@@ -118,13 +120,15 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
         _animationController.forward().then((_) {
           _animationController.reverse();
         });
-        _soundPlayer.play(AssetSource('shake.mp3'));
+        _playse('melon_shake.mp3');
         
         setState(() {
           _shakePhaseCount++;
           if (_shakePhaseCount >= 30) {
             _isCooked = true;
-            _soundPlayer.play(AssetSource('complete.mp3'));
+            _bgmPlayer.dispose();
+            
+            _playse('cook_success.mp3');
           }
         });
         
@@ -141,12 +145,13 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
       }
     });
   }
-  void _playse(String fileName) async {
-    await player.play(AssetSource(fileName));
-  }
+
   Future<void> _playBGM() async{
     await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
     await _bgmPlayer.play(AssetSource('cook.mp3'));
+  }
+  void _playse(String fileName) async {
+    await player.play(AssetSource(fileName));
   }
   void _setupAudioContext() async {
     // グローバルオーディオコンテキストの設定（iOS/Android共通）
@@ -170,7 +175,6 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
     _accelerometerSubscription?.cancel();
     _animationController.dispose();
     _bgmPlayer.dispose();
-    _soundPlayer.dispose();
     super.dispose();
   }
   
@@ -290,7 +294,7 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
                     return Transform.translate(
                       offset: Offset(_shakeAnimation.value * sin(_animationController.value * pi * 2), 0),
                       child: Transform.translate(
-                        offset: Offset(0, -_carrotPosition),
+                        offset: Offset(0, 0),
                         child: Image.asset(
                           _isCooked
                               ? 'assets/melonjuice.png'
