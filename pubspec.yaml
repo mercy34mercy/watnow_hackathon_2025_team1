@@ -89,6 +89,11 @@ flutter:
     - assets/melon_cut.mp3
     - assets/melon_firstcut.mp3
     - assets/melon_shake.mp3
+    - assets/eat.mp3
+    - assets/carrot_rabbit.png
+    - assets/melon_rabbit.png
+    - assets/punpkin_rabbit.png
+    - assets/krank.png
     - assets/furiage.mp3
     - assets/punch.mp3
     - assets/yokoni.mp3

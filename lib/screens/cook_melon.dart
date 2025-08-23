@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 import 'dart:math';
+import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 
 class CookMelonScreen extends StatefulWidget {
@@ -28,6 +30,8 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
   
   int _fineCutCount = 0;
   int _shakePhaseCount = 0;
+  DateTime? startTime;  // 料理開始時間を記録
+  double? completionTime;  // 完成時の記録時間
   
   final AudioPlayer _bgmPlayer = AudioPlayer(playerId: "bgm");
   final player = AudioPlayer(playerId: "se");
@@ -37,6 +41,7 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
     super.initState();
     _setupAudioContext();
     _playBGM();
+    startTime = DateTime.now();  // タイマー開始
     
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 100),
@@ -131,7 +136,12 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
           _shakePhaseCount++;
           if (_shakePhaseCount >= 30) {
             _isCooked = true;
+            // 完成時の時間を記録
+            if (startTime != null) {
+              completionTime = DateTime.now().difference(startTime!).inMilliseconds.toDouble();
+            }
             _bgmPlayer.dispose();
+            _saveCookedDish();
             
             
             _playse('cook_success.mp3');
@@ -160,6 +170,41 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
     await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
     await _bgmPlayer.play(AssetSource('cook.mp3'));
   }
+  Future<void> _saveCookedDish() async {
+    final prefs = await SharedPreferences.getInstance();
+    int melonCount = prefs.getInt('melon') ?? 0;
+    int melonJuiceCount = prefs.getInt('melonjuice') ?? 0;
+    
+    if (melonCount > 0) {
+      await prefs.setInt('melon', melonCount - 1);
+      await prefs.setInt('melonjuice', melonJuiceCount + 1);
+    }
+    
+    // completionTimeが既に計算されているのでそれを使用
+    if (completionTime != null) {
+      // 記録リストを取得
+      String? recordsJson = prefs.getString('melonjuice_records');
+      List<double> records = [];
+      
+      if (recordsJson != null) {
+        List<dynamic> decoded = jsonDecode(recordsJson);
+        records = decoded.map((e) => e as double).toList();
+      }
+      
+      // 新しい記録を追加（completionTimeを使用）
+      records.add(completionTime!);
+      records.sort();
+      
+      // トップ10の記録のみ保存
+      if (records.length > 10) {
+        records = records.take(10).toList();
+      }
+      
+      // 保存
+      await prefs.setString('melonjuice_records', jsonEncode(records));
+    }
+  }
+
   void _playse(String fileName) async {
     await player.play(AssetSource(fileName));
   }
@@ -240,23 +285,49 @@ class _CookMelonScreenState extends State<CookMelonScreen> with SingleTickerProv
                     _isCooked
                         ? SizedBox(height: 0)
                         : Image.asset('assets/bikkurisen.png', width: 300),
-                    Text(
-                      _isCooked
-                          ? 'できあがりました!'
-                          : _isShakePhase
-                              ? 'シェイクせよ!'
-                              : _isFineCutting
-                                  ? '細かく切れ!'
-                                  : _isHorizontalCut
-                                      ? '準備完了!'
-                                      : _isVerticalCut
-                                          ? '横に切れ!'
-                                          : '縦に切れ!',
-                      style: TextStyle(
-                        fontSize: _isCooked ? 33 : 36,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
+                    Column(
+                      children: [
+                        Text(
+                          _isCooked
+                              ? 'できあがりました!'
+                              : _isShakePhase
+                                  ? 'シェイクせよ!'
+                                  : _isFineCutting
+                                      ? '細かく切れ!'
+                                      : _isHorizontalCut
+                                          ? '準備完了!'
+                                          : _isVerticalCut
+                                              ? '横に切れ!'
+                                              : '縦に切れ!',
+                          style: TextStyle(
+                            fontSize: _isCooked ? 33 : 36,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (_isCooked && completionTime != null) ...[
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.yellow[100],
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.orange,
+                                width: 2,
+                              ),
+                            ),
+                            child: Text(
+                              '記録: ${(completionTime! / 1000).toStringAsFixed(2)}秒',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
