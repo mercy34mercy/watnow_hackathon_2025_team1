@@ -89,6 +89,9 @@ flutter:
     - assets/melon_cut.mp3
     - assets/melon_firstcut.mp3
     - assets/melon_shake.mp3
+    - assets/furiage.mp3
+    - assets/punch.mp3
+    - assets/yokoni.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -33,6 +33,7 @@ class _GameMelonScreenState extends State<GameMelonScreen> with SingleTickerProv
     super.initState();
     _setupAudioContext();
     _playBGM();
+    _playse('yokoni.mp3');
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
@@ -167,6 +168,10 @@ void _setupAudioContext() async {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Text(
+                  '横に振れ！',
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
                 Text(
                   '残り時間: $timelimit',
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
