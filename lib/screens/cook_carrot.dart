@@ -56,7 +56,6 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
   }
 
   void _startAccelerometer() {
-  
     @override
     Widget build(BuildContext context) {
       return Scaffold(
@@ -103,11 +102,11 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
       }
     });
   }
-  Future<void> _playBGM() async{
+
+  Future<void> _playBGM() async {
     await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
     await _bgmPlayer.play(AssetSource('cook.mp3'));
   }
-
 
   @override
   void dispose() {
@@ -132,6 +131,34 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
               height: 150,
               child: Container(color: Colors.brown[600]),
             ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 45,
+              child: isCooked
+                  ? Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/');
+                        },
+                        child: Text('ホーム画面に戻る', style: TextStyle(fontSize: 20)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            255,
+                            166,
+                            71,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                          // fixedSize: Size(, height)
+                        ),
+                      ),
+                    )
+                  : SizedBox(),
+            ),
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -139,11 +166,17 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
                   Stack(
                     alignment: Alignment.center,
                     children: [
-                      Image.asset('assets/bikkurisen.png', width: 300),
+                      isCooked
+                          ? SizedBox(height: 0)
+                          : Image.asset('assets/bikkurisen.png', width: 300),
                       Text(
-                        isCut ? 'こねろ!' : '切れ!',
-                        style: const TextStyle(
-                          fontSize: 66,
+                        isCut
+                            ? isCooked
+                                  ? 'できあがりました!'
+                                  : 'こねろ!'
+                            : '切れ!',
+                        style: TextStyle(
+                          fontSize: isCooked ? 33 : 66,
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
@@ -151,14 +184,16 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
                     ],
                   ),
 
-                  SizedBox(height: 30),
-                  Text(
-                    '切った回数: $_shakeCount',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                  if (!isCut && !isCooked) ...[
+                    const SizedBox(height: 30),
+                    Text(
+                      '切った回数: $_shakeCount',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
+                  ],
 
                   if (isCut && !isCooked) ...[
                     const SizedBox(height: 20),
@@ -196,7 +231,7 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
                             isCooked
                                 ? 'assets/carrotcake.png'
                                 : 'assets/ninzin.png',
-                            height: 200,
+                            height: isCooked ? 500 : 200,
                           ),
                         ),
                       );
