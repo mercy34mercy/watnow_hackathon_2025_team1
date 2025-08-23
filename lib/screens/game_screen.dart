@@ -125,8 +125,10 @@ class _GameScreenState extends State<GameScreen>
     // グローバルオーディオコンテキストの設定（iOS/Android共通）
     final audioContext = AudioContext(
       iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
         options: {
           AVAudioSessionOptions.mixWithOthers,
+          AVAudioSessionOptions.defaultToSpeaker,
         },
       ),
       android: AudioContextAndroid(
