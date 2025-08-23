@@ -70,6 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ElevatedButton(
                   onPressed: ()async {
                     int veg = Random().nextInt(3);
+                    _bgmPlayer.dispose();
                     await _sePlayer.play(AssetSource('taiko.mp3'));
                     await _sePlayer.onPlayerComplete.first;
                     _bgmPlayer.dispose();

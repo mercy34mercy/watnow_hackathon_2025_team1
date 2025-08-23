@@ -31,6 +31,8 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
   void initState() {
     super.initState();
     _playBGM();
+    _setupAudioContext();
+    _playse('punch.mp3');
     
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 600),
@@ -166,6 +168,10 @@ class _GamePumpkinScreenState extends State<GamePumpkinScreen> with SingleTicker
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Text(
+                  'パンチ！',
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
                 Text(
                   '残り時間: $timelimit',
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
