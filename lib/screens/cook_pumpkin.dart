@@ -73,7 +73,6 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
 
           if (_shakeCount >= 5) {
             isCut = true;
-            _playse('cook_success.mp3');
           }
         });
 
@@ -133,7 +132,7 @@ class _CookPumpkinScreenState extends State<CookPumpkinScreen>
           _mashTimer?.cancel();
           _isMashing = false;
           // つぶし完了音
-          _playse('cook_success.mp3');
+          
         }
       });
     });

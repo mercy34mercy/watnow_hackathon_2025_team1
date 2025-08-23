@@ -49,8 +49,11 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
       if (isCut && !isCooked) {
         setState(() {
           kneadCount++;
+          _playse('press.mp3');
           if (kneadCount >= 10) {
             isCooked = true;
+            _playse('cook_success.mp3');
+            _bgmPlayer.dispose();
           }
         });
       }
@@ -82,6 +85,7 @@ class _CookCarrotScreenState extends State<CookCarrotScreen>
 
         setState(() {
           _shakeCount++;
+          _playse('cut.mp3');
           _carrotPosition = min(_shakeCount * 2.0, 20.0);
 
           if (_shakeCount >= 5) {
