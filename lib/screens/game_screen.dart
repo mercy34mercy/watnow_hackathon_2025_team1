@@ -25,11 +25,14 @@ class _GameScreenState extends State<GameScreen>
   bool _canHarvest = false;
   double _carrotPosition = 0;
 
-  final AudioPlayer _bgmPlayer = AudioPlayer();
+  final AudioPlayer _bgmPlayer = AudioPlayer(playerId: "bgm");
+  final player = AudioPlayer(playerId: "se");
+
 
   @override
   void initState() {
     super.initState();
+    _setupAudioContext();
     _playBGM();
 
     _animationController = AnimationController(
@@ -101,7 +104,6 @@ class _GameScreenState extends State<GameScreen>
     });
   }
 
-  final player = AudioPlayer();
   void _playse(String fileName) async {
     await player.play(AssetSource(fileName));
   }
@@ -109,6 +111,23 @@ class _GameScreenState extends State<GameScreen>
   Future<void> _playBGM() async {
     await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
     await _bgmPlayer.play(AssetSource('harvest.mp3'));
+  }
+   void _setupAudioContext() async {
+    // グローバルオーディオコンテキストの設定（iOS/Android共通）
+    final audioContext = AudioContext(
+      iOS: AudioContextIOS(
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.music,
+        usageType: AndroidUsageType.media,
+        audioFocus: AndroidAudioFocus.none,
+      ),
+    );
+    
+    await AudioPlayer.global.setAudioContext(audioContext);
   }
 
   @override
